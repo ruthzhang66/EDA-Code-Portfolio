@@ -2,7 +2,7 @@
 # Harrisburg University of Science and Technology - Chenlu Zhang
 # This code portfolio contains weekly coding practice for ANLY 506-51 class, most codes are from YaRrr! The Pirate’s Guide to R by Nathaniel D. Phillips and some are from Exploratory Data Analysis by Roger D. Peng.
 # 
-# Each week's practice has one or two files named under the week number, depending on how many coding pratices are required. R markdowns and R files are saved under the first folder, while the output of html, pdf and png are saved under the second folder. Please note that I only include the pdf and png that are saved under my working directory when running codes. Other pictures that are not saved in the directory are not included.
+# Each week's practice has one or two files named under the week number, depending on how many coding pratices are required. R markdowns and R files are saved under the first folder.
 
 # Week 2 practice involves Chapter 9 Importing, saving and managing data.
 # Week 3's topic is Exploratory Data Analysis Checklist.
