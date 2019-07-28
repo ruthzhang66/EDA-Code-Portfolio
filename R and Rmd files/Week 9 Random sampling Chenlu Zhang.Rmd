@@ -1,0 +1,91 @@
+---
+title: "Week 9 Random sampling Chenlu Zhang"
+author: "Chenlu Zhang"
+date: "7/27/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Peng, R. (2010). Reading  Peng, R. (2010) 7 Plotting Systems
+
+
+```{r}
+#plot() and lines() to create a plot contains both line and dots
+data(airquality)
+with(airquality, {plot(Temp, Ozone)+
+    lines(loess.smooth(Temp, Ozone))
+  })
+
+# scatter plot btw speed and dist:
+data(cars)
+ with(cars, plot(speed, dist))
+
+# add title
+ title("Speed vs. Stopping distance")
+
+#Lattice can be used for multi dimensional data
+#install the package
+library(lattice)
+
+#create a df
+state <- data.frame(state.x77, region = state.region)
+
+#xyplot: divide the plot into four parts using layout argument
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
+
+```
+
+Next let's turn to ggplot.
+```{r}
+#install the package
+#install.packages("ggplot2")
+library("ggplot2")
+
+#view mpg
+data(mpg)
+
+#a typical dots plot using qplot
+qplot(displ, hwy, data = mpg)
+
+
+```
+
+
+
+Peng, R. (2010). 8 Graphics Devices
+
+```{r}
+# plot() with title
+with(faithful, plot(eruptions, waiting))
+
+# add a titile
+title(main = "Old Faithful Geyser data")
+
+# plot and save it in a pdf file 
+pdf(file = "myplot.pdf")  
+with(faithful, plot(eruptions, waiting)) 
+
+#add a titile
+title(main = "Old Faithful Geyser data") 
+
+#close the png
+dev.off()  
+
+# install the datasets package
+library(datasets)
+
+# create a plot and save it to a png file
+with(faithful, plot(eruptions, waiting)) 
+
+#add a titile
+title(main = "Old Faithful Geyser data")  
+dev.copy(png, file = "geyserplot.png")  
+dev.off()
+
+```
+

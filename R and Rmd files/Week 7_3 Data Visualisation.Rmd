@@ -1,0 +1,205 @@
+---
+title: "Week 7 Data visualisation Chenlu Zhang"
+author: "Chenlu Zhang"
+date: "7/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+3 Data visualisation
+
+```{r}
+#install ggplotg
+#install.packages("tidyverse")
+library("ggplot2")
+library(tidyverse)
+
+# view mpg
+mpg
+
+#scatter plot: x as disp and y as hwy.
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+#scatter plot: x as cyl and y as hwy.
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = cyl, y = hwy))
+
+#scatter plot: x as class and y as drv.
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = class, y = drv))
+
+
+
+```
+Wr can't draw any helpful conclusiond from graphs above.
+
+Next we can add aesthetics for nicer graphs.
+
+```{r message=FALSE, warning=FALSE}
+
+#add aesthetic to scatter plot
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy,shape = class ))
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = class))
+
+#set aesthetic manually
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), col = "green")
+
+```
+
+
+Then we can add facets to our plots for comparisons.
+
+
+```{r}
+
+#scatter plots with facets grouped by by classes
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_wrap(~ class, nrow = 3)
+
+#scatter plots with facets grouped by drv and cyl
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(drv ~ cyl)
+
+```
+
+
+
+Now we can explore more theods like geom smooth plots.
+
+```{r}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy))
+
+#linetype
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = class))
+
+# combine different methods in the same plot
+    ggplot(data = mpg) +
+  geom_smooth(
+    mapping = aes(x = displ, y = hwy, color = class),
+    show.legend = FALSE
+  )
+
+#combine two geoms
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth()
+
+
+```
+
+
+Then let's turn to plots with more specific needs
+
+
+```{r}
+#plot displ as x and hwy as y, using different colors for classes.
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = class)) + geom_smooth()
+
+
+#add aes for geom smooth 
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class)) + 
+  geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
+
+
+#bar chart
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+
+#plot summary using ggplot
+ggplot(data = diamonds) + 
+  stat_summary(
+    mapping = aes(x = cut, y = depth),
+    fun.ymin = min,
+    fun.ymax = max,
+    fun.y = median
+  )
+
+#use a variable as color/fill
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, colour = cut))
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = cut))
+
+#stacked bars
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+
+#change alpha (if you want to set it to be transparent use fill = NA)
+ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + 
+  geom_bar(alpha = 1/5, position = "identity")
+
+ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
+  geom_bar(fill = NA, position = "identity")
+
+
+```
+
+
+Finally, more tips to manipulate graphs can be found below.
+
+```{r}
+# use position="fill" to plot bars with the same height
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+
+# use position="fill" to plot overlapping stacks
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+
+# use coord_flip() to switch x and y axis in a plot
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_boxplot()
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_boxplot() +
+  coord_flip()
+
+# use coord_quickmap() to plot on a map
+#install.packages("maps")
+nz <- map_data("nz")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "red")
+
+ggplot(nz, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", colour = "yellow") +
+  coord_quickmap()
+
+#use coord_polar() to plot on polar
+bar <- ggplot(data = diamonds) + 
+  geom_bar(
+    mapping = aes(x = cut, fill = cut), 
+    show.legend = FALSE,
+    width = 1 ) +  theme(aspect.ratio = 1) + labs(x = NULL, y = NULL)
+
+bar
+```
+
+
+
+```{r}
+bar + coord_flip()
+bar + coord_polar()
+```
+
+

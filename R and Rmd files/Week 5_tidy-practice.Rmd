@@ -1,0 +1,77 @@
+---
+title: "Tidy Data"
+author: "Chenlu Zhang"
+date: "07/25/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Missing Values
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(readr)
+library(knitr)
+library(Hmisc)
+library(missForest)
+```
+## Missing Values
+
+```{r echo=FALSE}
+data("iris")
+```
+
+Set missing values ( 10% ) 
+
+```{r}
+##Generate missing values (0.1) and check missing values in the table below using summary()
+iris.mis <- prodNA(iris, noNA = 0.1)
+kable(summary(iris.mis))
+```
+```{r}
+#Print the sum of missing values
+print(paste0("Missing Values:", sum(is.na(iris.mis)==TRUE)))
+```
+
+Impute with mean value
+
+```{r}
+# impute imputed_age to iris.mis using the mean value of Sepal.Length
+
+iris.mis$imputed_age <- with(iris.mis, impute(Sepal.Length, mean))
+
+```
+Impute using argImpute
+```{r warning=FALSE, message=FALSE}
+#using argImpute
+impute_arg <- aregImpute(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width +
+Species, data = iris.mis, n.impute = 5)
+```
+```{r}
+#display impute_arg and a specific column Septal.Length
+impute_arg
+impute_arg$imputed$Sepal.Length # check
+```
+
+```{r message=FALSE, warning=FALSE}
+#
+religion = read_csv("religion_income.csv")
+```
+
+## Gather data from wide to long table
+```{r}
+#Create a kable for religion
+kable(religion)
+```
+
+```{r}
+#Store income and frequency for 10 observations in "long"
+long <- religion %>% 
+  gather(income, freq, 2:11)
+kable(long[1:10,])
+```
+
