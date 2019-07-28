@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Peng, R. (2010). Reading  Peng, R. (2010) 7 Plotting Systems
 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #plot() and lines() to create a plot contains both line and dots
 data(airquality)
 with(airquality, {plot(Temp, Ozone)+
@@ -41,7 +41,7 @@ xyplot(Life.Exp ~ Income | region, data = state, layout = c(4, 1))
 ```
 
 Next let's turn to ggplot.
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #install the package
 #install.packages("ggplot2")
 library("ggplot2")
@@ -59,7 +59,7 @@ qplot(displ, hwy, data = mpg)
 
 Peng, R. (2010). 8 Graphics Devices
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 # plot() with title
 with(faithful, plot(eruptions, waiting))
 

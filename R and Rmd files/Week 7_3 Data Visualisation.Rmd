@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 3 Data visualisation
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #install ggplotg
 #install.packages("tidyverse")
 library("ggplot2")
@@ -63,7 +63,7 @@ ggplot(data = mpg) +
 Then we can add facets to our plots for comparisons.
 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 
 #scatter plots with facets grouped by by classes
 ggplot(data = mpg) + 
@@ -81,7 +81,7 @@ ggplot(data = mpg) +
 
 Now we can explore more theods like geom smooth plots.
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy))
 
@@ -108,7 +108,7 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 Then let's turn to plots with more specific needs
 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #plot displ as x and hwy as y, using different colors for classes.
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
   geom_point(mapping = aes(color = class)) + geom_smooth()
@@ -156,7 +156,7 @@ ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) +
 
 Finally, more tips to manipulate graphs can be found below.
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 # use position="fill" to plot bars with the same height
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
@@ -197,7 +197,7 @@ bar
 
 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 bar + coord_flip()
 bar + coord_polar()
 ```

@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #check model assumptions
 #Model 1:Y =3+5x+??,?????N(0,1)
 #Model 2:Y=3+5x+??,?????N(0,x^2)
@@ -58,7 +58,7 @@ abline(h = 0, col = "darkorange", lwd = 2)
 
 Graphs for Model 2, which has non-constant variance.
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #set seed and plot
 set.seed(42)
 sim_data_2 = sim_2()
@@ -78,7 +78,7 @@ abline(h = 0, col = "darkorange", lwd = 2)
 
 Next let's look at Model 3, where y has non-linear relationship with independent variables. 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #set seed and plot for model 3
 set.seed(42)
 sim_data_3 = sim_3()
@@ -100,7 +100,7 @@ abline(h = 0, col = "darkorange", lwd = 2)
 
 Breusch-Pagan Test (known as BP test)
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #install.packages("lmtest")
 library(lmtest)
 
@@ -117,7 +117,7 @@ bptest(fit_3)
 
 Histograms and QQ plots
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #histograms for residuals
 par(mfrow = c(1, 3))
 
@@ -148,7 +148,7 @@ hist(resid(fit_3),
 
 ```
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #QQ plots
 #qqnorm will give you plots
 #qqline will give you line chart
@@ -232,7 +232,7 @@ qqline(resid(fit_3), col = "dodgerblue", lwd = 2)
 Shapiro-Wilk Test
 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #Shapiro-Wilk normality test
 #the test will return statistic and its p-value
 #H0:data were sampled from a normal distribution
@@ -253,7 +253,7 @@ shapiro.test(resid(fit_3))
 
 More plots: plots with different leverage, residual and influence.
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 # plots with different leverage, residual and influence
 par(mfrow = c(1, 3))
 set.seed(42)
@@ -313,7 +313,7 @@ coef(model_1)[2]
 
 Leverage
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #create a df
 lev_ex = data.frame(
   x1 = c(0, 11, 11, 7, 4, 10, 5, 8),
@@ -382,7 +382,7 @@ hatvalues(model_3) > 2 * mean(hatvalues(model_3))
 
 Outliers
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #use resid() for residuals
 resid(model_1)
 
@@ -416,7 +416,7 @@ cooks.distance(model_3)[11] > 4 / length(cooks.distance(model_3))
 
 Diagnotics example (using mtcars dataset)
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 # install.packages("devtools")
 # devtools::install_github("coatless/ucidata")
 library("ucidata")

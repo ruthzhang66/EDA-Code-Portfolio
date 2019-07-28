@@ -27,19 +27,19 @@ data("iris")
 
 Set missing values ( 10% ) 
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 ##Generate missing values (0.1) and check missing values in the table below using summary()
 iris.mis <- prodNA(iris, noNA = 0.1)
 kable(summary(iris.mis))
 ```
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #Print the sum of missing values
 print(paste0("Missing Values:", sum(is.na(iris.mis)==TRUE)))
 ```
 
 Impute with mean value
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 # impute imputed_age to iris.mis using the mean value of Sepal.Length
 
 iris.mis$imputed_age <- with(iris.mis, impute(Sepal.Length, mean))
@@ -51,7 +51,9 @@ Impute using argImpute
 impute_arg <- aregImpute(~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width +
 Species, data = iris.mis, n.impute = 5)
 ```
-```{r}
+
+
+```{r, message=FALSE, , warning=FALSE}
 #display impute_arg and a specific column Septal.Length
 impute_arg
 impute_arg$imputed$Sepal.Length # check
@@ -63,12 +65,12 @@ religion = read_csv("religion_income.csv")
 ```
 
 ## Gather data from wide to long table
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #Create a kable for religion
 kable(religion)
 ```
 
-```{r}
+```{r, message=FALSE, , warning=FALSE}
 #Store income and frequency for 10 observations in "long"
 long <- religion %>% 
   gather(income, freq, 2:11)
