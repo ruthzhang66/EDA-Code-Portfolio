@@ -1,0 +1,506 @@
+---
+title: "Chapter 13 Model Diagnostics"
+author: "Chenlu Zhang"
+date: "7/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r}
+#check model assumptions
+#Model 1:Y =3+5x+??,?????N(0,1)
+#Model 2:Y=3+5x+??,?????N(0,x^2)
+#Model 3:Y=3+5x2+??,?????N(0,25)
+                      
+sim_1 = function(sample_size = 500) {
+  x = runif(n = sample_size) * 5
+  y = 3 + 5 * x + rnorm(n = sample_size, mean = 0, sd = 1)
+  data.frame(x, y)
+}
+
+sim_2 = function(sample_size = 500) {
+  x = runif(n = sample_size) * 5
+  y = 3 + 5 * x + rnorm(n = sample_size, mean = 0, sd = x)
+  data.frame(x, y)
+}
+
+sim_3 = function(sample_size = 500) {
+  x = runif(n = sample_size) * 5
+  y = 3 + 5 * x ^ 2 + rnorm(n = sample_size, mean = 0, sd = 5)
+  data.frame(x, y)
+}
+
+#set seed and check the head of sim data 1(from model 1)
+set.seed(42)
+sim_data_1 = sim_1()
+head(sim_data_1)
+
+#scartterplot
+plot(y ~ x, data = sim_data_1, col = "grey", pch = 20,
+     main = "Data from Model 1")
+fit_1 = lm(y ~ x, data = sim_data_1)
+abline(fit_1, col = "darkorange", lwd = 3)
+
+#a fitted vs residual plot with residuals as y
+plot(fitted(fit_1), resid(fit_1), col = "grey", pch = 20,
+     xlab = "Fitted", ylab = "Residuals", main = "Data from Model 1")
+abline(h = 0, col = "darkorange", lwd = 2)
+
+
+```
+
+
+Graphs for Model 2, which has non-constant variance.
+
+```{r}
+#set seed and plot
+set.seed(42)
+sim_data_2 = sim_2()
+fit_2 = lm(y ~ x, data = sim_data_2)
+plot(y ~ x, data = sim_data_2, col = "grey", pch = 20,
+     main = "Data from Model 2")
+abline(fit_2, col = "darkorange", lwd = 3)
+
+#plot a fitted vs residuals plot for model 2
+#add a fitted line
+plot(fitted(fit_2), resid(fit_2), col = "grey", pch = 20,
+     xlab = "Fitted", ylab = "Residuals", main = "Data from Model 2")
+abline(h = 0, col = "darkorange", lwd = 2)
+
+
+```
+
+Next let's look at Model 3, where y has non-linear relationship with independent variables. 
+
+```{r}
+#set seed and plot for model 3
+set.seed(42)
+sim_data_3 = sim_3()
+fit_3 = lm(y ~ x, data = sim_data_3)
+plot(y ~ x, data = sim_data_3, col = "grey", pch = 20,
+     main = "Data from Model 3")
+abline(fit_3, col = "darkorange", lwd = 3)
+
+#plot a fitted vs residuals plot for model 3
+#add a fitted line
+plot(fitted(fit_3), resid(fit_3), col = "grey", pch = 20,
+     xlab = "Fitted", ylab = "Residuals", main = "Data from Model 3")
+abline(h = 0, col = "darkorange", lwd = 2)
+
+
+
+```
+
+
+Breusch-Pagan Test (known as BP test)
+
+```{r}
+#install.packages("lmtest")
+library(lmtest)
+
+#BP test for model 1 and 2 and 3
+#large p-value means we can not reject the null hypothesis
+#small p-value means we should reject the null hypothesis
+#H0: Homoscedasticity. The errors have constant variance about the true model.
+bptest(fit_1)
+bptest(fit_2)
+bptest(fit_3)
+
+
+```
+
+Histograms and QQ plots
+
+```{r}
+#histograms for residuals
+par(mfrow = c(1, 3))
+
+#hist for model1
+hist(resid(fit_1),
+     xlab   = "Residuals",
+     main   = "Histogram of Residuals, fit_1",
+     col    = "darkorange",
+     border = "dodgerblue",
+     breaks = 20)
+
+#hist for model 2
+hist(resid(fit_2),
+     xlab   = "Residuals",
+     main   = "Histogram of Residuals, fit_2",
+     col    = "darkorange",
+     border = "dodgerblue",
+     breaks = 20)
+
+#hist for model 3
+hist(resid(fit_3),
+     xlab   = "Residuals",
+     main   = "Histogram of Residuals, fit_3",
+     col    = "darkorange",
+     border = "dodgerblue",
+     breaks = 20)
+
+
+```
+
+```{r}
+#QQ plots
+#qqnorm will give you plots
+#qqline will give you line chart
+qqnorm(resid(fit_1), main = "Normal Q-Q Plot, fit_1", col = "darkgrey")
+qqline(resid(fit_1), col = "dodgerblue", lwd = 2)
+
+#create a function for qq plot
+qq_plot = function(e) {
+
+  n = length(e)
+  normal_quantiles = qnorm(((1:n - 0.5) / n))
+# normal_quantiles = qnorm(((1:n) / (n + 1)))
+
+# plot theoretical verus observed quantiles
+  plot(normal_quantiles, sort(e),
+       xlab = c("Theoretical Quantiles"),
+       ylab = c("Sample Quantiles"),
+       col = "darkgrey")
+# add a title
+  title("Normal Q-Q Plot")
+
+# calculate line through the first and third quartiles
+  slope     = (quantile(e, 0.75) - quantile(e, 0.25)) / (qnorm(0.75) - qnorm(0.25))
+  intercept = quantile(e, 0.25) - slope * qnorm(0.25)
+
+# add to existing plot
+  abline(intercept, slope, lty = 2, lwd = 2, col = "dodgerblue")
+}
+
+
+#the below method will have the same output as above
+set.seed(420)
+
+#create a normal distribution of mean = 0 and std =1
+x = rnorm(100, mean = 0 , sd = 1)
+par(mfrow = c(1, 2))
+qqnorm(x, col = "darkgrey")
+qqline(x, lty = 2, lwd = 2, col = "dodgerblue")
+qq_plot(x)
+
+#data simulation and plots
+par(mfrow = c(1, 3))
+set.seed(420)
+qq_plot(rnorm(10))
+qq_plot(rnorm(25))
+qq_plot(rnorm(100))
+
+#set degree of freedom
+par(mfrow = c(1, 3))
+set.seed(420)
+qq_plot(rt(10, df = 4))
+qq_plot(rt(25, df = 4))
+qq_plot(rt(100, df = 4))
+
+
+#rexp() refers tp exponential distribution
+par(mfrow = c(1, 3))
+set.seed(420)
+qq_plot(rexp(10))
+qq_plot(rexp(25))
+qq_plot(rexp(100))
+
+#normality error assessment for model 1
+qqnorm(resid(fit_1), main = "Normal Q-Q Plot, fit_1", col = "darkgrey")
+qqline(resid(fit_1), col = "dodgerblue", lwd = 2)
+
+#plot for model 2 -> non normal distribution 
+qqnorm(resid(fit_2), main = "Normal Q-Q Plot, fit_2", col = "darkgrey")
+qqline(resid(fit_2), col = "dodgerblue", lwd = 2)
+
+#plot for model 3 -> non normal distribution
+qqnorm(resid(fit_3), main = "Normal Q-Q Plot, fit_3", col = "darkgrey")
+qqline(resid(fit_3), col = "dodgerblue", lwd = 2)
+
+
+
+```
+
+
+
+Shapiro-Wilk Test
+
+
+```{r}
+#Shapiro-Wilk normality test
+#the test will return statistic and its p-value
+#H0:data were sampled from a normal distribution
+#a small p-value means data are sampled from a normal distribution
+set.seed(42)
+
+# for different datasets
+shapiro.test(rnorm(25))
+shapiro.test(rexp(25))
+
+#the result of shapiro.test() on the residuals of each
+shapiro.test(resid(fit_1))
+shapiro.test(resid(fit_2))
+shapiro.test(resid(fit_3))
+
+
+```
+
+More plots: plots with different leverage, residual and influence.
+
+```{r}
+# plots with different leverage, residual and influence
+par(mfrow = c(1, 3))
+set.seed(42)
+ex_data  = data.frame(x = 1:10,
+                      y = 10:1 + rnorm(n = 10))
+ex_model = lm(y ~ x, data = ex_data)
+
+# low leverage, large residual, small influence
+point_1 = c(5.4, 11)
+ex_data_1 = rbind(ex_data, point_1)
+model_1 = lm(y ~ x, data = ex_data_1)
+plot(y ~ x, data = ex_data_1, cex = 2, pch = 20, col = "grey",
+     main = "Low Leverage, Large Residual, Small Influence")
+points(x = point_1[1], y = point_1[2], pch = 1, cex = 4, col = "black", lwd = 2)
+abline(ex_model, col = "dodgerblue", lwd = 2)
+abline(model_1, lty = 2, col = "darkorange", lwd = 2)
+legend("bottomleft", c("Original Data", "Added Point"),
+       lty = c(1, 2), col = c("dodgerblue", "darkorange"))
+
+# high leverage, small residual, small influence
+point_2 = c(18, -5.7)
+ex_data_2 = rbind(ex_data, point_2)
+model_2 = lm(y ~ x, data = ex_data_2)
+plot(y ~ x, data = ex_data_2, cex = 2, pch = 20, col = "grey",
+     main = "High Leverage, Small Residual, Small Influence")
+points(x = point_2[1], y = point_2[2], pch = 1, cex = 4, col = "black", lwd = 2)
+abline(ex_model, col = "dodgerblue", lwd = 2)
+abline(model_2, lty = 2, col = "darkorange", lwd = 2)
+legend("bottomleft", c("Original Data", "Added Point"),
+       lty = c(1, 2), col = c("dodgerblue", "darkorange"))
+
+# high leverage, large residual, large influence
+point_3 = c(14, 5.1)
+ex_data_3 = rbind(ex_data, point_3)
+model_3 = lm(y ~ x, data = ex_data_3)
+plot(y ~ x, data = ex_data_3, cex = 2, pch = 20, col = "grey", ylim = c(-3, 12),
+     main = "High Leverage, Large Residual, Large Influence")
+points(x = point_3[1], y = point_3[2], pch = 1, cex = 4, col = "black", lwd = 2)
+abline(ex_model, col = "dodgerblue", lwd = 2)
+abline(model_3, lty = 2, col = "darkorange", lwd = 2)
+legend("bottomleft", c("Original Data", "Added Point"),
+       lty = c(1, 2), col = c("dodgerblue", "darkorange"))
+
+
+#slope of the regression for the original ten points
+coef(ex_model)[2]
+coef(model_1)[2]
+coef(model_2)[2]
+coef(model_3)[2]
+
+#the added point in the first plot has a small effect on the slope
+coef(model_1)[2]
+
+
+
+```
+
+Leverage
+
+```{r}
+#create a df
+lev_ex = data.frame(
+  x1 = c(0, 11, 11, 7, 4, 10, 5, 8),
+  x2 = c(1, 5, 4, 3, 1, 4, 4, 2),
+  y  = c(11, 15, 13, 14, 0, 19, 16, 8))
+
+#plot the df
+plot(x2 ~ x1, data = lev_ex, cex = 2)
+points(7, 3, pch = 20, col = "red", cex = 2)
+
+#combine differnt columns using cbine()
+X = cbind(rep(1, 8), lev_ex$x1, lev_ex$x2)
+H = X %*% solve(t(X) %*% X) %*% t(X)
+
+# extract diagonal elements
+diag(H)
+
+#the sume of elements
+sum(diag(H))
+
+#hatvalues() returns the leverages
+lev_fit = lm(y ~ ., data = lev_ex)
+hatvalues(lev_fit)
+
+#check intercepts for variables
+coef(lev_fit)
+
+#find the maximum value of leverages
+which.max(hatvalues(lev_fit))
+lev_ex[which.max(hatvalues(lev_fit)),]
+
+#modify y to 20
+lev_ex_1 = lev_ex
+lev_ex_1$y[1] = 20
+lm(y ~ ., data = lev_ex_1)
+
+#minimum value of leverages
+which.min(hatvalues(lev_fit))
+lev_ex[which.min(hatvalues(lev_fit)),]
+
+#modify y to 30 and run linear regression
+lev_ex_2 = lev_ex
+lev_ex_2$y[4] = 30
+lm(y ~ ., data = lev_ex_2)
+
+#check mean values
+mean(lev_ex$x1)
+mean(lev_ex$x2)
+
+#check rows
+lev_ex[4,]
+
+#calculate leverages for the three models above
+hatvalues(model_1)
+hatvalues(model_2)
+hatvalues(model_3)
+
+#logical test
+hatvalues(model_1) > 2 * mean(hatvalues(model_1))
+hatvalues(model_2) > 2 * mean(hatvalues(model_2))
+hatvalues(model_3) > 2 * mean(hatvalues(model_3))
+
+
+
+```
+
+Outliers
+
+```{r}
+#use resid() for residuals
+resid(model_1)
+
+#use rstandard() for standardized residuals
+rstandard(model_1)
+
+#check residuals larger than a threshold (2)
+rstandard(model_1)[abs(rstandard(model_1)) > 2]
+
+#repeat the same codes for model 2
+resid(model_2)
+rstandard(model_2)
+rstandard(model_2)[abs(rstandard(model_2)) > 2]
+
+#repeat the same codes for model 3
+resid(model_3)
+rstandard(model_3)
+rstandard(model_3)[abs(rstandard(model_3)) > 2]
+
+#check if influential
+cooks.distance(model_1)[11] > 4 / length(cooks.distance(model_1))
+
+cooks.distance(model_2)[11] > 4 / length(cooks.distance(model_2))
+
+cooks.distance(model_3)[11] > 4 / length(cooks.distance(model_3))
+
+
+
+```
+
+
+Diagnotics example (using mtcars dataset)
+
+```{r}
+# install.packages("devtools")
+# devtools::install_github("coatless/ucidata")
+library("ucidata")
+
+#run a linear regression
+mpg_hp_add = lm(mpg ~ hp + am, data = mtcars)
+
+#plot fitted vs residuals
+plot(fitted(mpg_hp_add), resid(mpg_hp_add), col = "grey", pch = 20,
+     xlab = "Fitted", ylab = "Residual",
+     main = "mtcars: Fitted versus Residuals")
+abline(h = 0, col = "darkorange", lwd = 2)
+
+
+#run a bptest
+bptest(mpg_hp_add)
+
+#qqplots
+qqnorm(resid(mpg_hp_add), col = "darkgrey")
+qqline(resid(mpg_hp_add), col = "dodgerblue", lwd = 2)
+
+#shapiro-Wilk test 
+shapiro.test(resid(mpg_hp_add))
+
+#find out how many large leverages are there
+sum(hatvalues(mpg_hp_add) > 2 * mean(hatvalues(mpg_hp_add)))
+
+#find out how many large residuals are there
+sum(abs(rstandard(mpg_hp_add)) > 2)
+
+# check if influential
+cd_mpg_hp_add = cooks.distance(mpg_hp_add)
+sum(cd_mpg_hp_add > 4 / length(cd_mpg_hp_add))
+
+#although influential, but below codes indicate they are different brands' cars
+large_cd_mpg = cd_mpg_hp_add > 4 / length(cd_mpg_hp_add)
+cd_mpg_hp_add[large_cd_mpg]
+
+#coefficients before
+coef(mpg_hp_add)
+
+#coefficients after removing the two points
+mpg_hp_add_fix = lm(mpg ~ hp + am,
+                    data = mtcars,
+                    subset = cd_mpg_hp_add <= 4 / length(cd_mpg_hp_add))
+coef(mpg_hp_add_fix)
+
+
+#plot residuals vs fitted and normal qq plot
+par(mfrow = c(2, 2))
+plot(mpg_hp_add)
+
+#check the structure
+str(autompg)
+
+#normal qq plot
+big_model = lm(mpg ~ displacement * horsepower * origin, data = autompg)
+qqnorm(resid(big_model), col = "darkgrey")
+qqline(resid(big_model), col = "dodgerblue", lwd = 2)
+
+#Sharpio.test
+shapiro.test(resid(big_model))
+
+# check influential points
+big_mod_cd = cooks.distance(big_model)
+sum(big_mod_cd > 4 / length(big_mod_cd))
+
+#remove 31 influential points
+big_model_fix = lm(mpg ~ displacement * horsepower * origin,
+                   data = autompg,
+                   subset = big_mod_cd < 4 / length(big_mod_cd))
+
+#qq plot
+qqnorm(resid(big_model_fix), col = "grey")
+qqline(resid(big_model_fix), col = "dodgerblue", lwd = 2)
+
+# run shapiro.test one more time to make sure it rejects H0
+shapiro.test(resid(big_model_fix))
+
+
+
+```
+
+
+
+
+
